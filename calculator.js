@@ -137,7 +137,9 @@ class Calculator {
 
   addButton(button, symbol) {
     button.addEventListener('click', () => {
-      this.display.addCharacter(symbol);
+      if (this.allowedInDisplay(symbol)) {
+        this.display.addCharacter(symbol);
+      }
     });
   }
 
@@ -160,7 +162,28 @@ class Calculator {
   }
 
   allowedInDisplay(symbol) {
-    //TODO
+    const str = this.display.line1;
+    const previousChar = str[str.length - 1];
+
+    // If the symbol is a number, we allways allow this to be typed.
+    // By the way, if it's an operator, we don't want two operators typed
+    // together, expect if the last one is a minus, for operation like 2 * (-7)
+
+    if (
+      Token.isOperator(symbol) &&
+      (Token.isOperator(previousChar) || typeof previousChar === 'undefined')
+    ) {
+      if (Token.isOperator(str[str.length - 2])) {
+        return false;
+      }
+      if (symbol !== '-' && typeof str[str.length - 2] === 'undefined') {
+        return false;
+      }
+    }
+
+    if (symbol === '-' && previousChar === '-') {
+      return false;
+    }
     return true;
   }
 

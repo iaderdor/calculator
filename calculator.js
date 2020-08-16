@@ -258,6 +258,49 @@ class Calculator {
     return true;
   }
 
+  multiplyAndDivide(tokens) {
+    // Locate position of multiplication operators
+    const multiplyRegex = /[x]/;
+    const divisionRegex = /[/]/;
+
+    const multiplyPos = tokens
+      .map((token, idx) => {
+        if (token.type === 'OP' && multiplyRegex.test(token.value)) {
+          return idx;
+        } else {
+          return undefined;
+        }
+      })
+      .filter(x => x !== undefined);
+
+    multiplyPos.forEach(pos => {
+      tokens[pos - 1].value = tokens[pos - 1].value * tokens[pos + 1].value;
+      this.nullifyToken(tokens, pos);
+      this.nullifyToken(tokens, pos + 1);
+      tokens = this.deleteNullTokens(tokens);
+    });
+
+    // Locate position of division operators
+    const divisionPos = tokens
+      .map((token, idx) => {
+        if (token.type === 'OP' && divisionRegex.test(token.value)) {
+          return idx;
+        } else {
+          return undefined;
+        }
+      })
+      .filter(x => x !== undefined);
+
+    divisionPos.forEach(pos => {
+      tokens[pos - 1].value = tokens[pos - 1].value / tokens[pos + 1].value;
+      this.nullifyToken(tokens, pos);
+      this.nullifyToken(tokens, pos + 1);
+      tokens = this.deleteNullTokens(tokens);
+    });
+
+    return tokens;
+  }
+
   solveMath() {
     let expression = new Token();
     console.log(expression.tokenize(this.display.line1));

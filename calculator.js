@@ -197,8 +197,7 @@ class Calculator {
   }
 
   parseTokens(tokens) {
-    // Check negative values
-
+    // Convert tokens.value strings to number
     tokens.map(token => {
       const regex = /\d+/;
       if (regex.test(token.value)) {
@@ -206,6 +205,7 @@ class Calculator {
       }
     });
 
+    // Get idx of OP tokens with -
     const minusPos = tokens
       .map((token, idx) => {
         if (token.type === 'OP' && /[-]/.test(token.value)) {
@@ -215,20 +215,45 @@ class Calculator {
         }
       })
       .filter(x => x !== undefined);
-    minusPos.forEach(pos => {
-      if (pos === 0) {
-        this.nullifyToken(tokens, pos);
-        tokens[pos + 1].value = -tokens[pos + 1].value;
-      } else {
-        if (tokens[pos].type === tokens[pos - 1].type) {
+
+    // Convert a minus sign and a number into a negative number.
+    if (minusPos.length > 1) {
+      minusPos.forEach(pos => {
+        if (pos === 0) {
           this.nullifyToken(tokens, pos);
           tokens[pos + 1].value = -tokens[pos + 1].value;
+        } else {
+          if (tokens[pos].type === tokens[pos - 1].type) {
+            this.nullifyToken(tokens, pos);
+            tokens[pos + 1].value = -tokens[pos + 1].value;
+          }
         }
-      }
-    });
+      });
+    }
     tokens = this.deleteNullTokens(tokens);
 
-    // Check theres no errors
+    // Check there's no errors
+
+    // First token must be a number
+    if (tokens[0].type != 'NUM') {
+      return false;
+    }
+
+    // OP tokens must be alone
+    const opPos = tokens
+      .map((token, idx) => {
+        if (token.type === 'OP') {
+          return idx;
+        } else {
+          return undefined;
+        }
+      })
+      .filter(x => x !== undefined);
+    for (let idx = 0; idx < idx - 1; idx++) {
+      if (opPos[idx] + 1 == opPos[idx + 1]) {
+        return false;
+      }
+    }
 
     return true;
   }

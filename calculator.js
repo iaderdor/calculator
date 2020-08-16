@@ -187,6 +187,52 @@ class Calculator {
     return true;
   }
 
+  nullifyToken(tokens, pos) {
+    tokens[pos].value = '';
+    tokens[pos].type = 'NULL';
+  }
+
+  deleteNullTokens(tokens) {
+    return tokens.filter(token => token.type !== 'NULL');
+  }
+
+  parseTokens(tokens) {
+    // Check negative values
+
+    tokens.map(token => {
+      const regex = /\d+/;
+      if (regex.test(token.value)) {
+        token.value = Number(token.value);
+      }
+    });
+
+    const minusPos = tokens
+      .map((token, idx) => {
+        if (token.type === 'OP' && /[-]/.test(token.value)) {
+          return idx;
+        } else {
+          return undefined;
+        }
+      })
+      .filter(x => x !== undefined);
+    minusPos.forEach(pos => {
+      if (pos === 0) {
+        this.nullifyToken(tokens, pos);
+        tokens[pos + 1].value = -tokens[pos + 1].value;
+      } else {
+        if (tokens[pos].type === tokens[pos - 1].type) {
+          this.nullifyToken(tokens, pos);
+          tokens[pos + 1].value = -tokens[pos + 1].value;
+        }
+      }
+    });
+    tokens = this.deleteNullTokens(tokens);
+
+    // Check theres no errors
+
+    return true;
+  }
+
   solveMath() {
     let expression = new Token();
     console.log(expression.tokenize(this.display.line1));

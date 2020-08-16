@@ -301,12 +301,64 @@ class Calculator {
     return tokens;
   }
 
+  addAndSubstract(tokens) {
+    // Locate position of addition operators
+    const additionRegex = /[+]/;
+    const substractionRegex = /[-]/;
+
+    const additionPos = tokens
+      .map((token, idx) => {
+        if (token.type === 'OP' && additionRegex.test(token.value)) {
+          return idx;
+        } else {
+          return undefined;
+        }
+      })
+      .filter(x => x !== undefined);
+
+    additionPos.forEach(pos => {
+      tokens[pos - 1].value = tokens[pos - 1].value + tokens[pos + 1].value;
+      this.nullifyToken(tokens, pos);
+      this.nullifyToken(tokens, pos + 1);
+      tokens = this.deleteNullTokens(tokens);
+    });
+
+    // Locate position of division operators
+    const substractionPos = tokens
+      .map((token, idx) => {
+        if (token.type === 'OP' && substractionRegex.test(token.value)) {
+          return idx;
+        } else {
+          return undefined;
+        }
+      })
+      .filter(x => x !== undefined);
+
+    substractionPos.forEach(pos => {
+      tokens[pos - 1].value = tokens[pos - 1].value - tokens[pos + 1].value;
+      this.nullifyToken(tokens, pos);
+      this.nullifyToken(tokens, pos + 1);
+      tokens = this.deleteNullTokens(tokens);
+    });
+
+    return tokens;
+  }
+
   solveMath() {
     let expression = new Token();
-    console.log(expression.tokenize(this.display.line1));
-    this.display.clearScreen();
+    expression.tokenize(this.display.line1);
 
-    //TODO: Make the solver
+    if (!this.parseTokens(expression.tokens)) {
+      this.display.line2 = 'Error';
+      this.display.updateScreen();
+    }
+
+    expression.tokens = this.multiplyAndDivide(expression.tokens);
+    expression.tokens = this.addAndSubstract(expression.tokens);
+
+    this.display.clearScreen();
+    this.display.line2 = expression.tokens[0].value.toFixed(10);
+    this.display.updateScreen();
   }
 }
 

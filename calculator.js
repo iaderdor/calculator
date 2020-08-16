@@ -28,7 +28,7 @@ class Token {
         continue;
       }
 
-      if (Token.isOperator(s.trim()) && !Token.isOperator(following)) {
+      if (Token.isOperator(s.trim())) {
         this.tokens.push({ type: 'OP', value: s.trim() });
         s = '';
         continue;

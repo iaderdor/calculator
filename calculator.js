@@ -1,3 +1,48 @@
+class Token {
+  constructor() {
+    this.inst = null;
+    this.tokens = [];
+  }
+
+  static isNumber(c) {
+    return /\d/.test(c);
+  }
+
+  static isOperator(c) {
+    const operators = '+-x/'.split('');
+    return operators.some(operator => {
+      return c === operator;
+    });
+  }
+
+  tokenize(str) {
+    str = str.trim();
+    let s = '';
+
+    for (var idx = 0; idx < str.length; idx++) {
+      s += str[idx];
+      const following = str[idx + 1];
+      if (Token.isNumber(s.trim()) && !Token.isNumber(following)) {
+        this.tokens.push({ type: 'NUM', value: s.trim() });
+        s = '';
+        continue;
+      }
+
+      if (Token.isOperator(s.trim()) && !Token.isOperator(following)) {
+        this.tokens.push({ type: 'OP', value: s.trim() });
+        s = '';
+        continue;
+      }
+
+      if (idx == str.length - 1) {
+        this.tokens.push({ type: 'EOF' });
+        continue;
+      }
+    }
+    return this.tokens;
+  }
+}
+
 class Display {
   constructor(screen) {
     this.screen = screen;
@@ -120,6 +165,10 @@ class Calculator {
   }
 
   solveMath() {
+    let expression = new Token();
+    console.log(expression.tokenize(this.display.line1));
+    this.display.clearScreen();
+
     //TODO: Make the solver
   }
 }

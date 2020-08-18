@@ -45,6 +45,8 @@ class Token {
 
 class Display {
   constructor(screen) {
+    this.SCREENSIZE1 = 32;
+    this.SCREENSIZE2 = 10;
     this.screen = screen;
     this.clearScreen();
   }
@@ -66,8 +68,26 @@ class Display {
   }
 
   updateScreen() {
-    this.screen[0].textContent = this.line1;
-    this.screen[1].textContent = this.line2;
+    let textForLine1 = String(this.line1);
+    let textForLine2 = String(this.line2);
+
+    if (textForLine1.length > this.SCREENSIZE1) {
+      textForLine1 = textForLine1.slice(textForLine1.length - this.SCREENSIZE1);
+    }
+    if (textForLine2.length > this.SCREENSIZE2) {
+      let hasDot = textForLine2.indexOf('.') !== -1;
+
+      if (hasDot) {
+        textForLine2 = Number(textForLine2).toPrecision(this.SCREENSIZE2 - 1);
+        textForLine2 = String(textForLine2);
+      } else {
+        textForLine2 = Number(textForLine2).toPrecision(this.SCREENSIZE2 - 5);
+        textForLine2 = String(textForLine2);
+      }
+    }
+
+    this.screen[0].textContent = textForLine1;
+    this.screen[1].textContent = textForLine2;
   }
 
   addCharacter(symbol) {
@@ -353,8 +373,7 @@ class Calculator {
     expression.tokens = this.multiplyAndDivide(expression.tokens);
     expression.tokens = this.addAndSubstract(expression.tokens);
 
-    this.display.clearScreen();
-    this.display.line2 = expression.tokens[0].value.toFixed(10);
+    this.display.line2 = expression.tokens[0].value;
     this.display.updateScreen();
   }
 }

@@ -195,7 +195,7 @@ class Display {
       let hasDot = textForLine2.indexOf('.') !== -1;
 
       if (hasDot) {
-        textForLine2 = Number(textForLine2).toPrecision(this.SCREENSIZE2 - 1);
+        textForLine2 = Number(textForLine2).toPrecision(this.SCREENSIZE2 - 2);
         textForLine2 = String(textForLine2);
       } else {
         textForLine2 = Number(textForLine2).toPrecision(this.SCREENSIZE2 - 5);

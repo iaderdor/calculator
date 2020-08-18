@@ -275,6 +275,8 @@ class Calculator {
     this.addDelButton(butDel);
     this.addButton(butAns, 'A');
     this.addButton(butExp, 'e');
+
+    this.keyListener();
   }
 
   addButton(button, symbol) {
@@ -303,6 +305,35 @@ class Calculator {
   addDelButton(button) {
     button.addEventListener('click', () => {
       this.display.removeCharacter();
+    });
+  }
+
+  keyListener() {
+    const keysRegex = /^(\d|[Ae.\-+x/]$){1}?/;
+    document.addEventListener('keydown', e => {
+      let key = e.key;
+
+      console.log(key);
+      if (key === '*') {
+        key = 'x';
+      }
+
+      if (keysRegex.test(key)) {
+        if (this.allowedInDisplay(key)) {
+          this.display.addCharacter(key);
+        }
+      }
+
+      if (key === 'Enter') {
+        const line1 = this.display.line1;
+        if (!Token.isOperator(line1[line1.length - 1])) {
+          this.solveMath();
+        }
+      }
+
+      if (key === 'Backspace') {
+        this.display.removeCharacter();
+      }
     });
   }
 

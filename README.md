@@ -4,8 +4,11 @@
 
 ## Getting Started
 
-Download the files and open `calculator.html` on a web browser.
+Download the files and open `calculator.html` on a web browser or just open [this link](https://iaderdor.github.io/calculator/calculator.html).
 
+## Special thanks
+
+To Chidume Nnamdi for [this article](https://blog.bitsrc.io/parsing-expressions-in-javascript-4c156f0cbaec) which helped me a lot for knowing how to parse an expression.
 
 ## Authors
 

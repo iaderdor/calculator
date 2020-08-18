@@ -65,7 +65,7 @@ class Token {
       .filter(x => x !== undefined);
 
     // Convert a minus sign and a number into a negative number.
-    if (minusPos.length > 1) {
+    if (minusPos.length > 0) {
       minusPos.forEach(pos => {
         if (pos === 0) {
           this.nullifyToken(pos);

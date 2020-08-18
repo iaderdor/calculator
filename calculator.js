@@ -41,7 +41,6 @@ class Token {
         continue;
       }
     }
-    debugger;
     return this.tokens;
   }
 

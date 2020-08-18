@@ -28,6 +28,19 @@ button {
   background-color: #b3b3b3;
 }
 
+.op-button {
+  background-color: #47b8d4;
+}
+
+.eq-button {
+  background-color: #77dd77;
+}
+
+.ans-button {
+  background-color: blue;
+  color: white;
+}
+
 .danger-button {
   background-color: red;
   color: white;

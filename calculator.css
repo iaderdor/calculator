@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Cousine&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Cousine&display=swap');
 
 .container {
   display: block;
@@ -20,7 +20,7 @@ button {
   padding: 0;
   margin: 0.1em;
   border: 0.02em solid #4d4d4d;
-  font-family: "Cousine", monospace;
+  font-family: 'Cousine', monospace;
   color: black;
 }
 
@@ -36,17 +36,22 @@ button {
 .display {
   display: grid;
   border: 0.02em solid #4d4d4d;
-  font-family: "Cousine", monospace;
+  font-family: 'Cousine', monospace;
   color: black;
   padding: 0.5em;
   margin-bottom: 0.5em;
 }
 
 #displayline1 {
+  margin: 0;
+  padding: 0;
+  height: 1em;
   font-size: 1em;
 }
 
 #displayline2 {
+  margin: 0;
+  padding: 0;
   font-size: 3em;
   text-align: right;
 }

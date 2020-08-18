@@ -115,6 +115,7 @@ class Calculator {
     ];
 
     this.display = new Display(screen);
+    this.lastAns = 0;
 
     const but0 = document.querySelector('#but0');
     const but1 = document.querySelector('#but1');
@@ -134,6 +135,7 @@ class Calculator {
     const butC = document.querySelector('#butC');
     const butEqual = document.querySelector('#butEqual');
     const butDel = document.querySelector('#butDEL');
+    const butAns = document.querySelector('#butANS');
 
     this.addButton(but0, '0');
     this.addButton(but1, '1');
@@ -153,6 +155,7 @@ class Calculator {
     this.addClearButton(butC);
     this.addEqualButton(butEqual);
     this.addDelButton(butDel);
+    this.addButton(butAns, 'A');
   }
 
   addButton(button, symbol) {
@@ -186,6 +189,7 @@ class Calculator {
     const previousChar = str[str.length - 1];
 
     // If the symbol is a number, we allways allow this to be typed.
+    // If it's an A (for las ANSwer), last character should be an operator.
     // By the way, if it's an operator, we don't want two operators typed
     // together, expect if the last one is a minus, for operation like 2 * (-7)
 
@@ -199,6 +203,18 @@ class Calculator {
     }
 
     if (symbol === '-' && previousChar === '-') {
+      return false;
+    }
+
+    if (
+      symbol === 'A' &&
+      !Token.isOperator(previousChar) &&
+      typeof previousChar !== 'undefined'
+    ) {
+      return false;
+    }
+
+    if (previousChar === 'A' && Token.isNumber(symbol)) {
       return false;
     }
     return true;
@@ -363,7 +379,9 @@ class Calculator {
 
   solveMath() {
     let expression = new Token();
-    expression.tokenize(this.display.line1);
+    let line1 = this.display.line1;
+    line1 = line1.replaceAll('A', this.lastAns);
+    expression.tokenize(line1);
 
     if (!this.parseTokens(expression.tokens)) {
       this.display.line2 = 'Error';
@@ -373,7 +391,9 @@ class Calculator {
     expression.tokens = this.multiplyAndDivide(expression.tokens);
     expression.tokens = this.addAndSubstract(expression.tokens);
 
+    this.display.line1 = '';
     this.display.line2 = expression.tokens[0].value;
+    this.lastAns = expression.tokens[0].value;
     this.display.updateScreen();
   }
 }

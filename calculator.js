@@ -5,7 +5,7 @@ class Token {
   }
 
   static isNumber(c) {
-    return /\d/.test(c);
+    return /[0-9.]/.test(c);
   }
 
   static isOperator(c) {
@@ -189,7 +189,6 @@ class Calculator {
     const previousChar = str[str.length - 1];
 
     // If the symbol is a number, we allways allow this to be typed.
-    // If it's an A (for las ANSwer), last character should be an operator.
     // By the way, if it's an operator, we don't want two operators typed
     // together, expect if the last one is a minus, for operation like 2 * (-7)
 
@@ -206,6 +205,7 @@ class Calculator {
       return false;
     }
 
+    // If it's an A (for las ANSwer), last character should be an operator.
     if (
       symbol === 'A' &&
       !Token.isOperator(previousChar) &&
@@ -217,6 +217,16 @@ class Calculator {
     if (previousChar === 'A' && Token.isNumber(symbol)) {
       return false;
     }
+
+    // If it's a dot, we check that there is no more dots in the substring
+    // between operators
+    if (symbol === '.') {
+      const dotRegex = /(^|[+\-*/])\d*[.]\d*$/;
+      if (dotRegex.test(str)) {
+        return false;
+      }
+    }
+
     return true;
   }
 

@@ -173,10 +173,7 @@ class Calculator {
       Token.isOperator(symbol) &&
       (Token.isOperator(previousChar) || typeof previousChar === 'undefined')
     ) {
-      if (Token.isOperator(str[str.length - 2])) {
-        return false;
-      }
-      if (symbol !== '-' && typeof str[str.length - 2] === 'undefined') {
+      if (symbol !== '-') {
         return false;
       }
     }

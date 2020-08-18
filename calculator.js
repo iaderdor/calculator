@@ -5,7 +5,7 @@ class Token {
   }
 
   static isNumber(c) {
-    return /[0-9.]/.test(c);
+    return /[0-9.e]/.test(c);
   }
 
   static isOperator(c) {
@@ -18,11 +18,13 @@ class Token {
   tokenize(str) {
     str = str.trim();
     let s = '';
-
     for (var idx = 0; idx < str.length; idx++) {
       s += str[idx];
       const following = str[idx + 1];
-      if (Token.isNumber(s.trim()) && !Token.isNumber(following)) {
+      if (
+        Token.isNumber(s.trim()) &&
+        (!Token.isNumber(following) || idx === str.length - 1)
+      ) {
         this.tokens.push({ type: 'NUM', value: s.trim() });
         s = '';
         continue;
@@ -39,6 +41,7 @@ class Token {
         continue;
       }
     }
+    debugger;
     return this.tokens;
   }
 
@@ -251,6 +254,7 @@ class Calculator {
     const butEqual = document.querySelector('#butEqual');
     const butDel = document.querySelector('#butDEL');
     const butAns = document.querySelector('#butANS');
+    const butExp = document.querySelector('#butExp');
 
     this.addButton(but0, '0');
     this.addButton(but1, '1');
@@ -271,6 +275,7 @@ class Calculator {
     this.addEqualButton(butEqual);
     this.addDelButton(butDel);
     this.addButton(butAns, 'A');
+    this.addButton(butExp, 'e');
   }
 
   addButton(button, symbol) {
@@ -334,6 +339,14 @@ class Calculator {
 
     if (previousChar === 'A' && Token.isNumber(symbol)) {
       return false;
+    }
+
+    // If it's an e (for exponential), we allow this only after a number
+    if (symbol === 'e') {
+      const expRegex = /\d+$/;
+      if (!expRegex.test(str)) {
+        return false;
+      }
     }
 
     // If it's a dot, we check that there is no more dots in the substring

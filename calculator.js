@@ -363,7 +363,15 @@ class Calculator {
   solveMath() {
     let expression = new Token();
     let line1 = this.display.line1;
-    line1 = line1.replaceAll('A', this.lastAns);
+    // Replace all A with the number stored in memory
+    if (line1.indexOf('A') !== -1) {
+      const aOccurrencies = line1.split('').reduce((total, c) => {
+        return c === 'A' ? total + 1 : total;
+      }, 0);
+      for (let idx = 0; idx < aOccurrencies; idx++) {
+        line1 = line1.replace('A', this.lastAns);
+      }
+    }
     expression.tokenize(line1);
 
     if (expression.parseTokens()) {

@@ -41,6 +41,121 @@ class Token {
     }
     return this.tokens;
   }
+
+  parseTokens() {
+    // Convert tokens.value strings to number
+    this.tokens.map(token => {
+      const regex = /\d+/;
+      if (regex.test(token.value)) {
+        token.value = Number(token.value);
+      }
+    });
+
+    // Get idx of OP tokens with -
+    const minusPos = this.tokens
+      .map((token, idx) => {
+        if (token.type === 'OP' && /[-]/.test(token.value)) {
+          return idx;
+        } else {
+          return undefined;
+        }
+      })
+      .filter(x => x !== undefined);
+
+    // Convert a minus sign and a number into a negative number.
+    if (minusPos.length > 1) {
+      minusPos.forEach(pos => {
+        if (pos === 0) {
+          this.nullifyToken(pos);
+          this.tokens[pos + 1].value = -this.tokens[pos + 1].value;
+        } else {
+          if (this.tokens[pos].type === this.tokens[pos - 1].type) {
+            this.nullifyToken(pos);
+            this.tokens[pos + 1].value = -this.tokens[pos + 1].value;
+          }
+        }
+      });
+    }
+    this.deleteNullTokens();
+
+    // Check there's no errors
+
+    // First token must be a number
+    if (this.tokens[0].type != 'NUM') {
+      return false;
+    }
+
+    // OP tokens must be alone
+    const opPos = this.tokens
+      .map((token, idx) => {
+        if (token.type === 'OP') {
+          return idx;
+        } else {
+          return undefined;
+        }
+      })
+      .filter(x => x !== undefined);
+    for (let idx = 0; idx < idx - 1; idx++) {
+      if (opPos[idx] + 1 == opPos[idx + 1]) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  nullifyToken(pos) {
+    this.tokens[pos].value = '';
+    this.tokens[pos].type = 'NULL';
+  }
+
+  deleteNullTokens() {
+    this.tokens = this.tokens.filter(token => token.type !== 'NULL');
+  }
+
+  getLastNotNullToken(pos) {
+    for (let idx = pos - 1; idx >= 0; idx--) {
+      if (this.tokens[idx].type !== 'NULL') {
+        return this.tokens[idx];
+      }
+    }
+    throw new Error(`All tokens before position ${pos} are NULL`);
+  }
+
+  getNextNotNullToken(pos) {
+    for (let idx = pos + 1; idx < this.tokens.length; idx++) {
+      if (this.tokens[idx].type !== 'NULL') {
+        return this.tokens[idx];
+      }
+    }
+    throw new Error(`All tokens after position ${pos} are NULL`);
+  }
+
+  applyOperation(operation) {
+    const operationRegex = eval(`/[${operation}]/`);
+
+    const operationPos = this.tokens
+      .map((token, idx) => {
+        if (token.type === 'OP' && operationRegex.test(token.value)) {
+          return idx;
+        } else {
+          return undefined;
+        }
+      })
+      .filter(x => x !== undefined);
+
+    if (operation === 'x') {
+      operation = '*';
+    }
+    operationPos.forEach(pos => {
+      eval(
+        `this.getLastNotNullToken(pos).value ${operation}= this.getNextNotNullToken(pos).value;`
+      );
+      this.nullifyToken(pos);
+      this.nullifyToken(pos + 1);
+    });
+    this.deleteNullTokens();
+  }
 }
 
 class Display {
@@ -174,7 +289,10 @@ class Calculator {
 
   addEqualButton(button) {
     button.addEventListener('click', () => {
-      this.solveMath();
+      const line1 = this.display.line1;
+      if (!Token.isOperator(line1[line1.length - 1])) {
+        this.solveMath();
+      }
     });
   }
 
@@ -230,176 +348,23 @@ class Calculator {
     return true;
   }
 
-  nullifyToken(tokens, pos) {
-    tokens[pos].value = '';
-    tokens[pos].type = 'NULL';
-  }
-
-  deleteNullTokens(tokens) {
-    return tokens.filter(token => token.type !== 'NULL');
-  }
-
-  parseTokens(tokens) {
-    // Convert tokens.value strings to number
-    tokens.map(token => {
-      const regex = /\d+/;
-      if (regex.test(token.value)) {
-        token.value = Number(token.value);
-      }
-    });
-
-    // Get idx of OP tokens with -
-    const minusPos = tokens
-      .map((token, idx) => {
-        if (token.type === 'OP' && /[-]/.test(token.value)) {
-          return idx;
-        } else {
-          return undefined;
-        }
-      })
-      .filter(x => x !== undefined);
-
-    // Convert a minus sign and a number into a negative number.
-    if (minusPos.length > 1) {
-      minusPos.forEach(pos => {
-        if (pos === 0) {
-          this.nullifyToken(tokens, pos);
-          tokens[pos + 1].value = -tokens[pos + 1].value;
-        } else {
-          if (tokens[pos].type === tokens[pos - 1].type) {
-            this.nullifyToken(tokens, pos);
-            tokens[pos + 1].value = -tokens[pos + 1].value;
-          }
-        }
-      });
-    }
-    tokens = this.deleteNullTokens(tokens);
-
-    // Check there's no errors
-
-    // First token must be a number
-    if (tokens[0].type != 'NUM') {
-      return false;
-    }
-
-    // OP tokens must be alone
-    const opPos = tokens
-      .map((token, idx) => {
-        if (token.type === 'OP') {
-          return idx;
-        } else {
-          return undefined;
-        }
-      })
-      .filter(x => x !== undefined);
-    for (let idx = 0; idx < idx - 1; idx++) {
-      if (opPos[idx] + 1 == opPos[idx + 1]) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  multiplyAndDivide(tokens) {
-    // Locate position of multiplication operators
-    const multiplyRegex = /[x]/;
-    const divisionRegex = /[/]/;
-
-    const multiplyPos = tokens
-      .map((token, idx) => {
-        if (token.type === 'OP' && multiplyRegex.test(token.value)) {
-          return idx;
-        } else {
-          return undefined;
-        }
-      })
-      .filter(x => x !== undefined);
-
-    multiplyPos.forEach(pos => {
-      tokens[pos - 1].value = tokens[pos - 1].value * tokens[pos + 1].value;
-      this.nullifyToken(tokens, pos);
-      this.nullifyToken(tokens, pos + 1);
-      tokens = this.deleteNullTokens(tokens);
-    });
-
-    // Locate position of division operators
-    const divisionPos = tokens
-      .map((token, idx) => {
-        if (token.type === 'OP' && divisionRegex.test(token.value)) {
-          return idx;
-        } else {
-          return undefined;
-        }
-      })
-      .filter(x => x !== undefined);
-
-    divisionPos.forEach(pos => {
-      tokens[pos - 1].value = tokens[pos - 1].value / tokens[pos + 1].value;
-      this.nullifyToken(tokens, pos);
-      this.nullifyToken(tokens, pos + 1);
-      tokens = this.deleteNullTokens(tokens);
-    });
-
-    return tokens;
-  }
-
-  addAndSubstract(tokens) {
-    // Locate position of addition operators
-    const additionRegex = /[+]/;
-    const substractionRegex = /[-]/;
-
-    const additionPos = tokens
-      .map((token, idx) => {
-        if (token.type === 'OP' && additionRegex.test(token.value)) {
-          return idx;
-        } else {
-          return undefined;
-        }
-      })
-      .filter(x => x !== undefined);
-
-    additionPos.forEach(pos => {
-      tokens[pos - 1].value = tokens[pos - 1].value + tokens[pos + 1].value;
-      this.nullifyToken(tokens, pos);
-      this.nullifyToken(tokens, pos + 1);
-      tokens = this.deleteNullTokens(tokens);
-    });
-
-    // Locate position of division operators
-    const substractionPos = tokens
-      .map((token, idx) => {
-        if (token.type === 'OP' && substractionRegex.test(token.value)) {
-          return idx;
-        } else {
-          return undefined;
-        }
-      })
-      .filter(x => x !== undefined);
-
-    substractionPos.forEach(pos => {
-      tokens[pos - 1].value = tokens[pos - 1].value - tokens[pos + 1].value;
-      this.nullifyToken(tokens, pos);
-      this.nullifyToken(tokens, pos + 1);
-      tokens = this.deleteNullTokens(tokens);
-    });
-
-    return tokens;
-  }
-
   solveMath() {
     let expression = new Token();
     let line1 = this.display.line1;
     line1 = line1.replaceAll('A', this.lastAns);
     expression.tokenize(line1);
 
-    if (!this.parseTokens(expression.tokens)) {
+    if (expression.parseTokens()) {
       this.display.line2 = 'Error';
       this.display.updateScreen();
     }
 
-    expression.tokens = this.multiplyAndDivide(expression.tokens);
-    expression.tokens = this.addAndSubstract(expression.tokens);
+    //    expression.tokens = this.multiplyAndDivide(expression);
+    //    expression.tokens = this.addAndSubstract(expression);
+    expression.applyOperation('x');
+    expression.applyOperation('/');
+    expression.applyOperation('+');
+    expression.applyOperation('-');
 
     this.display.line1 = '';
     this.display.line2 = expression.tokens[0].value;

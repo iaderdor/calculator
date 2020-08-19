@@ -1,16 +1,84 @@
-@import url('https://fonts.googleapis.com/css2?family=Cousine&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cousine&family=Rubik&display=swap');
+
+body {
+  background-color: #b3b3b3;
+}
+
+h1 {
+  font-family: 'Rubik', sans-serif;
+  font-variant: small-caps;
+  text-align: center;
+}
+
+p {
+  font-family: 'Rubik', sans-serif;
+  margin-top: 2em;
+  font-variant: small-caps;
+  text-align: right;
+}
+
+a {
+  color: white;
+  text-decoration: none;
+}
+
+#link-to-website {
+  color: red;
+}
+
+@keyframes rainbow {
+  0% {
+    background-color: #ff2400;
+  }
+  12.5% {
+    background-color: #e81d1d;
+  }
+  25% {
+    background-color: #e8b71d;
+  }
+  37.5% {
+    background-color: #e3e81d;
+  }
+  50% {
+    background-color: #1de840;
+  }
+  62.5% {
+    background-color: #1ddde8;
+  }
+  75% {
+    background-color: #2b1de8;
+  }
+  87.5% {
+    background-color: #dd00f3;
+  }
+  100% {
+    background-color: #ff2400;
+  }
+}
+
+.icon {
+  position: relative;
+  top: 0.12em;
+  color: white;
+}
 
 .container {
   display: block;
   margin: auto;
-  max-width: 400px;
+  max-width: 22em;
 }
+
 .calculator {
   display: grid;
   justify-content: center;
+  background-color: #404040;
+  padding: 1em 0;
+  margin: auto;
+  max-width: 22em;
 }
 
 .row {
+  margin: 0.5em 0;
 }
 
 button {
@@ -19,7 +87,7 @@ button {
   text-align: center;
   padding: 0;
   margin: 0.1em;
-  border: 0.02em solid #4d4d4d;
+  border: 0.02em solid white;
   font-family: 'Cousine', monospace;
   color: black;
 }
@@ -33,7 +101,9 @@ button {
 }
 
 .eq-button {
-  background-color: #77dd77;
+  animation-name: rainbow;
+  animation-duration: 90s;
+  animation-iteration-count: infinite;
 }
 
 .ans-button {
@@ -51,6 +121,7 @@ button {
   border: 0.02em solid #4d4d4d;
   font-family: 'Cousine', monospace;
   color: black;
+  background-color: white;
   padding: 0.5em;
   margin-bottom: 0.5em;
 }
